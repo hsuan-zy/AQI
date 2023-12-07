@@ -1,0 +1,29 @@
+# 導入所需的模塊
+import requests
+import csv
+import os
+
+# 更改當前工作目錄到指定的路徑
+os.chdir('C:/Users/user/Desktop/csv')
+
+# 打開（或創建）一個名為 'csv-aqi.csv' 的 CSV 文件，並設置為寫入模式
+csvfile = open('csv-aqi.csv', 'w') 
+# 創建一個 CSV 寫入器對象
+csv_write = csv.writer(csvfile) 
+
+# 定義從哪裡獲取空氣品質數據的 API URL
+url = 'https://data.moenv.gov.tw/api/v2/aqx_p_432?api_key=e8dd42e6-9b8b-43f8-991e-b3dee723a52d&limit=1000&sort=ImportDate%20desc&format=JSON'
+# 發送 HTTP 請求並獲取數據
+data = requests.get(url) 
+# 解析 JSON 數據
+data_json = data.json() 
+
+# 創建一個列表來存儲即將寫入 CSV 文件的數據
+# 首先添加一個頭部行，包括 'county', 'sitename', 'aqi', '空氣品質'
+output = [['county','sitename','aqi','空氣品質']]
+# 遍歷從 API 獲取的數據，並將每個記錄的特定字段添加到列表中
+for i in data_json['records']:
+    output.append([i['county'],i['sitename'],i['aqi'],i['status']])
+
+# 將列表中的所有數據寫入先前打開的 CSV 文件
+csv_write.writerows(output)
